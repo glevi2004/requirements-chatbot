@@ -659,12 +659,6 @@ function SidebarMenuSubButton({
 
 function SidebarItems({ items }) {
   const { signOut } = useAuth();
-  const { setTheme } = useTheme();
-
-  const handleSignOut = async () => {
-    setTheme("light"); // Reset theme to light
-    await signOut();
-  };
 
   if (!items?.length) return null;
 
@@ -678,7 +672,7 @@ function SidebarItems({ items }) {
           if (item.title === "Sign Out") {
             return (
               <SidebarMenuItem key={item.title}>
-                <SidebarMenuButton onClick={handleSignOut}>
+                <SidebarMenuButton onClick={signOut}>
                   {Icon && <Icon className="shrink-0" />}
                   <span>{item.title}</span>
                 </SidebarMenuButton>

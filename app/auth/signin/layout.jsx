@@ -5,9 +5,5 @@ const geist = Geist({
 });
 
 export default function AuthLayout({ children }) {
-  return (
-    <div className={`${geist.className} min-h-screen bg-gray-50`}>
-      {children}
-    </div>
-  );
+  return <div className={`${geist.className} min-h-screen `}>{children}</div>;
 }
