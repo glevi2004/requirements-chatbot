@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/tooltip";
 import { useAuth } from "../../app/context/AuthContext";
 import Link from "next/link"; // Add this import at the top
+import { useTheme } from "next-themes";
 
 const sidebarItems = [
   {
@@ -658,6 +659,12 @@ function SidebarMenuSubButton({
 
 function SidebarItems({ items }) {
   const { signOut } = useAuth();
+  const { setTheme } = useTheme();
+
+  const handleSignOut = async () => {
+    setTheme("light"); // Reset theme to light
+    await signOut();
+  };
 
   if (!items?.length) return null;
 
@@ -671,7 +678,7 @@ function SidebarItems({ items }) {
           if (item.title === "Sign Out") {
             return (
               <SidebarMenuItem key={item.title}>
-                <SidebarMenuButton onClick={signOut}>
+                <SidebarMenuButton onClick={handleSignOut}>
                   {Icon && <Icon className="shrink-0" />}
                   <span>{item.title}</span>
                 </SidebarMenuButton>
