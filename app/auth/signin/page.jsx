@@ -6,7 +6,30 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { auth } from "@/firebase/firebaseConfig";
 
+/**
+ * Sign In Page Component
+ *
+ * Provides Google authentication functionality for the application.
+ * Uses Firebase Authentication with Google provider.
+ *
+ * Features:
+ * - Google OAuth sign-in
+ * - Error handling
+ * - Automatic redirection after auth
+ *
+ * @route /auth/signin
+ * @access Public
+ */
 export default function SignIn() {
+  /**
+   * Handles Google sign-in process
+   * Initializes Google Auth provider and triggers popup
+   * Automatically redirects to protected route on success
+   *
+   * @async
+   * @function signInWithGoogle
+   * @throws {FirebaseError} When authentication fails
+   */
   const signInWithGoogle = async () => {
     const provider = new GoogleAuthProvider();
     try {
@@ -31,6 +54,7 @@ export default function SignIn() {
             size="lg"
             className="w-full"
           >
+            {/* Google icon SVG */}
             <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
               <path
                 d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"

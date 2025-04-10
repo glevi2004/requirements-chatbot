@@ -6,8 +6,36 @@ import { onAuthStateChanged, signOut } from "firebase/auth";
 import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import { usePathname, useRouter } from "next/navigation";
 
+/**
+ * Authentication Context
+ *
+ * Provides authentication state and credit management functionality throughout the application.
+ * Handles user authentication, credit system, and Firestore document management.
+ *
+ * @typedef {Object} AuthContextType
+ * @property {Object|null} user - Current authenticated user object
+ * @property {boolean} loading - Authentication loading state
+ * @property {number} credits - User's current credit balance
+ * @property {Function} signOut - Function to sign out user
+ * @property {Function} deductCredit - Function to deduct one credit
+ * @property {Function} addCredits - Function to add credits
+ * @property {Function} resetCredits - Function to reset credits to zero
+ */
 const AuthContext = createContext({});
 
+/**
+ * Authentication Provider Component
+ *
+ * Wraps the application and provides authentication context.
+ * Manages:
+ * - User authentication state
+ * - Credit system
+ * - Firestore document creation/updates
+ * - Navigation based on auth state
+ *
+ * @param {Object} props
+ * @param {React.ReactNode} props.children - Child components
+ */
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [credits, setCredits] = useState(0);
@@ -15,7 +43,12 @@ export function AuthProvider({ children }) {
   const router = useRouter();
   const pathname = usePathname();
 
-  // Function to create or update user in Firestore
+  /**
+   * Creates or verifies user document in Firestore
+   * Initializes new users with 20 credits
+   *
+   * @param {Object} user - Firebase auth user object
+   * */
   const createUserDocument = async (user) => {
     const userRef = doc(db, "users", user.uid);
     const userSnap = await getDoc(userRef);
@@ -37,7 +70,12 @@ export function AuthProvider({ children }) {
     }
   };
 
-  // Add credit management functions
+  /**
+   * Fetches user's credit balance from Firestore
+   *
+   * @param {string} userId - Firebase user UID
+   * @returns {Promise<number>} User's credit balance
+   */
   const fetchUserCredits = async (userId) => {
     const userRef = doc(db, "users", userId);
     const userSnap = await getDoc(userRef);
@@ -48,6 +86,12 @@ export function AuthProvider({ children }) {
     return 0;
   };
 
+  /**
+   * Deducts one credit from user's balance
+   * Updates both local state and Firestore
+   *
+   * @returns {Promise<boolean>} Success status
+   */
   const deductCredit = async () => {
     if (!user || credits <= 0) return false;
 
@@ -65,6 +109,12 @@ export function AuthProvider({ children }) {
     }
   };
 
+  /**
+   * Adds specified amount of credits to user's balance
+   *
+   * @param {number} amount - Number of credits to add
+   * @returns {Promise<boolean>} Success status
+   */
   const addCredits = async (amount) => {
     if (!user) return false;
 
@@ -82,6 +132,11 @@ export function AuthProvider({ children }) {
     }
   };
 
+  /**
+   * Resets user's credits to zero
+   *
+   * @returns {Promise<boolean>} Success status
+   */
   const resetCredits = async () => {
     if (!user) return false;
 
@@ -99,14 +154,14 @@ export function AuthProvider({ children }) {
     }
   };
 
-  // Initial auth check
-  // useEffect(() => {
-  //   if (pathname !== "/auth/signin" && !auth.currentUser) {
-  //     router.push("/auth/signin");
-  //   }
-  // }, []);
-
-  // Auth state listener
+  /**
+   * Firebase auth state listener
+   * Handles:
+   * - User document creation
+   * - Credit fetching
+   * - Navigation
+   * - Loading state
+   */
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
@@ -127,6 +182,10 @@ export function AuthProvider({ children }) {
     return () => unsubscribe();
   }, [user]);
 
+  /**
+   * Handles user sign out
+   * Signs out from Firebase and redirects to signin page
+   */
   const handleSignOut = async () => {
     try {
       await signOut(auth);
@@ -136,6 +195,7 @@ export function AuthProvider({ children }) {
     }
   };
 
+  // Context value containing all auth and credit functionality
   const value = {
     user,
     loading,
@@ -153,4 +213,10 @@ export function AuthProvider({ children }) {
   );
 }
 
+/**
+ * Custom hook to use auth context
+ *
+ * @returns {AuthContextType} Auth context value
+ * @throws {Error} When used outside of AuthProvider
+ */
 export const useAuth = () => useContext(AuthContext);

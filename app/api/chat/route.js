@@ -3,9 +3,22 @@ import { streamText } from "ai";
 import { auth, db } from "@/firebase/firebaseConfig";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 
-// Allow streaming responses up to 30 seconds
-export const maxDuration = 30;
+/**
+ * Maximum duration for streaming responses
+ * @constant {number}
+ */ export const maxDuration = 30;
 
+/**
+ * System prompt for the AI model
+ * Defines the AI's role and output format for requirements analysis
+ *
+ * @constant {string}
+ * @description Instructs the AI to:
+ * - Act as a Requirements Analysis Assistant
+ * - Create structured tables with specific columns
+ * - Categorize requirements by type, priority, etc.
+ * - Include acceptance criteria
+ */
 const systemPrompt = `You are a Requirements Analysis Assistant specializing in extracting structured information from software requirements.
 
 When analyzing requirements, create a structured table with the following columns, and add more fields if necessary:
@@ -23,6 +36,15 @@ Example format:
 | R1 | Users must be able to login with email | Functional | High | Security | Authentication Service | - Valid email format<br>- Password meets security policy |
 `;
 
+/**
+ * Validates user credits and performs deduction
+ *
+ * @async
+ * @function checkAndDeductCredits
+ * @param {string} userId - Firebase user ID
+ * @throws {Error} If user not found or has insufficient credits
+ * @returns {Promise<boolean>} True if credit deduction successful
+ */
 async function checkAndDeductCredits(userId) {
   const userRef = doc(db, "users", userId);
   const userSnap = await getDoc(userRef);
@@ -46,6 +68,20 @@ async function checkAndDeductCredits(userId) {
   return true;
 }
 
+/**
+ * Chat API Route Handler
+ *
+ * Processes chat requests and returns AI responses using OpenAI's GPT-4-turbo
+ *
+ * Features:
+ * - User authentication check
+ * - Credit (fake) system integration, reduces points for each request
+ *
+ * @async
+ * @function POST
+ * @param {Request} req - Next.js route request
+ * @returns {Response} Streaming response or error
+ */
 export async function POST(req) {
   try {
     const { messages, userId } = await req.json();
