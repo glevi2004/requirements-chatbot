@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { useAuth } from "../app/context/AuthContext";
 import { useRouter } from "next/navigation";
 import { Card, CardHeader, CardTitle } from "../components/ui/card";
+import Loading from "./loading";
 
 export default function Home() {
   const { user } = useAuth();
@@ -19,15 +20,5 @@ export default function Home() {
 
   if (!user) return null;
 
-  return (
-    <div className="w-screen flex min-h-screen items-center justify-center p-4">
-      <Card className="w-full max-w-sm">
-        <CardHeader>
-          <CardTitle className="text-center text-2xl font-semibold">
-            Requirements Analysis Bot
-          </CardTitle>
-        </CardHeader>
-      </Card>
-    </div>
-  );
+  return <Loading />;
 }

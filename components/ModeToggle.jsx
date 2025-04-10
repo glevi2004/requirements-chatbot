@@ -31,6 +31,7 @@ export function ModeToggle() {
         <DropdownMenuItem onClick={() => setTheme("dark")}>
           Dark
         </DropdownMenuItem>
+        {/* Lets app follow user's system preferences (light or dark mode as set in their OS or browser) */}
         <DropdownMenuItem onClick={() => setTheme("system")}>
           System
         </DropdownMenuItem>
